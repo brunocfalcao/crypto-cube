@@ -9,7 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class GeckoCoin extends Model
 {
     use HasFactory;
-    use SoftDeletes;
 
     protected $guarded = [];
 }

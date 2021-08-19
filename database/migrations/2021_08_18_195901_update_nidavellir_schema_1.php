@@ -23,6 +23,8 @@ class UpdateNidavellirSchema1 extends Migration
 
             $table->string('name');
 
+            $table->timestamps();
+
             $table->engine = 'MyISAM';
         });
     }
