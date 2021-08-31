@@ -13,119 +13,51 @@ class CreateNidavellirSchema extends Migration
      */
     public function up()
     {
-        Schema::create('coins', function (Blueprint $table) {
+        Schema::create('crawlers', function (Blueprint $table) {
             $table->id();
 
-            $table->string('coin_id')
-                  ->unique();
+            $table->string('acronym')
+                  ->unique()
+                  ->comment('The crawler acronym, used for specific harcoded queries');
 
-            $table->string('symbol');
+            $table->boolean('is_live')
+                  ->default(false)
+                  ->comment('Can only be used if the crawler is active');
 
-            $table->string('name');
-
-            $table->longText('description')
-                  ->nullable();
-
-            $table->string('homepage_url')
-                  ->nullable();
-
-            $table->string('twitter_username')
-                  ->nullable();
-
-            $table->string('subreddit_url')
-                  ->nullable();
-
-            $table->string('image_url')
-                  ->nullable();
-
-            $table->unsignedInteger('alexa_rank')
-                  ->nullable();
-
-            $table->date('genesis_date')
-                  ->nullable();
-
-            $table->index('coin_id');
-
-            $table->timestamps();
-
-            $table->softDeletes();
+            $table->timestampTz('cooldown_until')
+                  ->nullable()
+                  ->comment('No calls on the crawler until this timestamp happens');
 
             $table->engine = 'MyISAM';
         });
 
-        Schema::create('coin_prices', function (Blueprint $table) {
+        Schema::create('symbols', function (Blueprint $table) {
             $table->id();
 
-            $table->foreignId('coin_id')
-                  ->constrained();
+            $table->string('name')
+                  ->comment('The symbol name');
 
-            $table->decimal('current_price', 15, 4)
-                  ->nullable();
+            $table->string('base_asset')
+                  ->comment('The currency symbol');
 
-            $table->decimal('market_cap', 20)
-                  ->nullable();
+            $table->string('quote_asset')
+                  ->comment('The quote currency symbol');
 
-            $table->unsignedBigInteger('market_cap_rank')
-                  ->nullable();
+            $table->unsignedInteger('market_cap_rank')
+                  ->nullable()
+                  ->comment('The market cap rank');
 
-            $table->unsignedBigInteger('total_volume')
-                  ->nullable();
+            $table->boolean('is_crawling_prices')
+                  ->default(false)
+                  ->comment('Symbol being crawled for prices');
 
-            $table->decimal('high_24h', 15, 4)
-                  ->nullable();
-
-            $table->decimal('low_24h', 15, 4)
-                  ->nullable();
-
-            $table->decimal('price_change_24h', 15, 4)
-                  ->nullable();
-
-            $table->decimal('price_change_percentage_24h', 15, 4)
-                  ->nullable();
-
-            $table->decimal('market_cap_change_24h', 20)
-                  ->nullable();
-
-            $table->decimal('market_cap_change_percentage_24h', 15, 4)
-                  ->nullable();
-
-            $table->decimal('circulating_supply', 20, 4)
-                  ->nullable();
-
-            $table->decimal('total_supply', 20, 4)
-                  ->nullable();
-
-            $table->decimal('max_supply', 20, 4)
-                  ->nullable();
-
-            $table->decimal('ath', 15, 4)
-                  ->nullable();
-
-            $table->decimal('ath_change_percentage', 15, 4)
-                  ->nullable();
-
-            $table->timestampTz('ath_date')
-                  ->nullable();
-
-            $table->decimal('atl', 15, 4)
-                  ->nullable();
-
-            $table->decimal('atl_change_percentage', 15, 4)
-                  ->nullable();
-
-            $table->decimal('price_change_percentage_1h', 15, 4)
-                  ->nullable();
-
-            $table->timestampTz('atl_date')
-                  ->nullable();
-
-            $table->timestampTz('last_updated')
-                  ->nullable();
+            $table->unsignedInteger('strategy_id')
+                  ->nullable()
+                  ->default(null)
+                  ->comment('The current strategy being used to trade this symbol');
 
             $table->timestamps();
-
             $table->softDeletes();
-
             $table->engine = 'MyISAM';
         });
     }
