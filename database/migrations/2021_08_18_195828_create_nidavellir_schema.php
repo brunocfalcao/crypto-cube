@@ -34,7 +34,12 @@ class CreateNidavellirSchema extends Migration
         Schema::create('symbols', function (Blueprint $table) {
             $table->id();
 
+            $table->string('canonical')
+                  ->unique()
+                  ->comment('The symbol canonical, meaning the base asset concatenated with the quote asset, uppercased');
+
             $table->string('name')
+                  ->nullable()
                   ->comment('The symbol name');
 
             $table->string('base_asset')
