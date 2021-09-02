@@ -128,20 +128,20 @@ class CandlestickObserver
             '1 YEAR'  => '1Y',
         ];
 
-        $pivot = $previous->count() > 0 ? $previous->last() : null;
+        $pivot = $previous->count() > 0 ? $previous->first() : null;
 
         foreach ($intervals as $key => $value) {
             $maxInterval = Candlestick::whereRaw('closed_at > date_sub(?, interval '.$key.')', [$candlestick->closed_at])
                                ->where('symbol_id', $candlestick->symbol_id)
                                ->where('id', '<>', $candlestick->id)
-                               ->where('id', '<>', optional($pivot)->id)
                                ->orderBy('close', 'desc')
                                ->first();
 
             if ($maxInterval && $maxInterval->close < $candlestick->close) {
                 $candlestick->update([
-                'breakout' => $value,
+                    'breakout' => $value,
                 ]);
+                //break;
             }
         }
 
@@ -150,13 +150,9 @@ class CandlestickObserver
          * dip (meaning it is surrounded by 2 higher close prices)
          * tip (meaning it is surrounded by 2 lower close prices)
          */
-
         if ($previous->count() == 2) {
-            $previous2ago = $previous->first();
-            $previous1ago = $previous->last();
-
-            $previous2ago->update(['level_type' => null]);
-            $previous1ago->update(['level_type' => null]);
+            $previous2ago = $previous->last();
+            $previous1ago = $previous->first();
 
             if ($previous2ago->close > $previous1ago->close &&
             $candlestick->close > $previous1ago->close) {
@@ -167,7 +163,7 @@ class CandlestickObserver
             if ($previous2ago->close < $previous1ago->close &&
             $candlestick->close < $previous1ago->close) {
                 $previous1ago->update(['level_type' => 'tip']);
-                $previous2ago->update(['level_type' => 'null']);
+                $previous2ago->update(['level_type' => null]);
             }
         }
 
@@ -177,6 +173,13 @@ class CandlestickObserver
          *https://www.ig.com/en/trading-strategies/16-candlestick-patterns-every-trader-should-know-180615.
          */
 
+
+        // General settings.
+        $pin = $candlestick->high - $candlestick->low;
+        $candle = $candlestick->open - $candlestick->close;
+        $topPercent = $pin * 0.05;
+        $bottomPercent = $pin * 0.05;
+
         /**
          * HAMMER
          * The hammer candlestick pattern is formed of a short body with a long
@@ -185,9 +188,32 @@ class CandlestickObserver
          * day, ultimately a strong buying pressure drove the price back up.
          * The colour of the body can vary, but green hammers indicate a
          * stronger bull market than red hammers.
+         *
+         * Computation limits:
+         * - High is less than 5% (high - low) from the open
+         * - (close - low) is at least 33% from (high - low)
          */
-        if ($candlestick->high == $candlestick->open) {
-            $candlestick->type = 'hammer';
+        if ($candlestick->high - $candlestick->open < $topPercent &&
+            $candlestick->close - $candlestick->low > $pin / 3) {
+                $candlestick->update(['single_type' => 'hammer']);
+        }
+
+        /**
+         * INVERSE-HAMMER
+         * A similarly bullish pattern is the inverted hammer. The only
+         * difference being that the upper wick is long, while the lower wick
+         * is short.
+         * It indicates a buying pressure, followed by a selling pressure that
+         * was not strong enough to drive the market price down. The inverse
+         * hammer suggests that buyers will soon have control of the market.         *
+         *
+         * Computation limits:
+         * - Low is less than 5% (high - low) from the close
+         * - (high - open) is at least 33% from (close - low)
+         */
+        if ($candlestick->close - $candlestick->low < $bottomPercent &&
+            $candlestick->high - $candlestick->open > $pin / 3) {
+                $candlestick->update(['single_type' => 'inverted-hammer']);
         }
 
         Candlestick::unignoreObservableEvents();
