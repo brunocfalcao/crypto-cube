@@ -12,14 +12,19 @@
     }],
     "require": {
         "php": "^7.4|^8.0",
-        "illuminate/support": "^8.0"
+        "illuminate/support": "^8.0",
+        "brunocfalcao/crypto-commands": "dev-master",
+        "brunocfalcao/crypto-cube": "dev-master"
     },
     "autoload": {
         "psr-4": {
             "Nidavellir\\CryptoCube\\": "src",
             "Nidavellir\\CryptoCube\\Factories\\": "database/factories/",
             "Nidavellir\\CryptoCube\\Seeders\\": "database/seeders/"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "extra": {
         "laravel": {
