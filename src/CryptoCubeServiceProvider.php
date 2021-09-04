@@ -3,10 +3,8 @@
 namespace Nidavellir\CryptoCube;
 
 use Illuminate\Support\ServiceProvider;
-use Nidavellir\CryptoCube\Models\Candlestick;
-use Nidavellir\CryptoCube\Models\Symbol;
-use Nidavellir\CryptoCube\Observers\CandlestickObserver;
-use Nidavellir\CryptoCube\Observers\SymbolObserver;
+use Nidavellir\CryptoCube\Models\Token;
+use Nidavellir\CryptoCube\Observers\TokenObserver;
 
 final class CryptoCubeServiceProvider extends ServiceProvider
 {
@@ -28,7 +26,6 @@ final class CryptoCubeServiceProvider extends ServiceProvider
 
     protected function loadObservers()
     {
-        Symbol::observe(SymbolObserver::class);
-        Candlestick::observe(CandlestickObserver::class);
+        Token::observe(TokenObserver::class);
     }
 }
