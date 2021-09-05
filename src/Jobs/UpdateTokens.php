@@ -21,7 +21,7 @@ class UpdateTokens implements ShouldQueue
      */
     public function __construct()
     {
-        //
+        $this->onQueue('nidavellir_' . env('APP_ENV'));
     }
 
     /**
