@@ -2,9 +2,9 @@
 
 namespace Nidavellir\CryptoCube\Observers;
 
+use donatj\Pushover\Pushover;
 use Illuminate\Support\Facades\Mail;
 use Nidavellir\CryptoCube\Models\Token;
-use donatj\Pushover\Pushover;
 
 class TokenObserver
 {
@@ -25,11 +25,11 @@ class TokenObserver
                 $message->from('me@brunofalcao.dev', 'Bruno Falcao');
                 $message->to('bruno@nidavellir.trade');
                 $message->subject('New token on Binance!');
-                $message->setBody('New token: ' . $token->canonical, 'text/html');
+                $message->setBody('New token: '.$token->canonical, 'text/html');
             });
 
             $po = new Pushover(env('PUSHOVER_APIKEY'), env('PUSHOVER_USERKEY'));
-            $po->send('New Binance token pair: ' . $token->canonical);
+            $po->send('New Binance token pair: '.$token->canonical);
         }
     }
 
