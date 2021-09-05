@@ -14,7 +14,8 @@
         "php": "^7.4|^8.0",
         "illuminate/support": "^8.0",
         "brunocfalcao/crypto-commands": "dev-master",
-        "brunocfalcao/crypto-cube": "dev-master"
+        "brunocfalcao/crypto-cube": "dev-master",
+        "donatj/pushover": "^2.1"
     },
     "autoload": {
         "psr-4": {
