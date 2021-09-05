@@ -24,7 +24,7 @@ class TokenObserver
             Mail::send([], [], function ($message) use ($token) {
                 $message->from('me@brunofalcao.dev', 'Bruno Falcao');
                 $message->to('bruno@nidavellir.trade');
-                $message->subject('New token on Binance!');
+                $message->subject('New token on Binance ('.$token->canonical.')');
                 $message->setBody('New token: '.$token->canonical, 'text/html');
             });
 
